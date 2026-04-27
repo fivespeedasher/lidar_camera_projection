@@ -1,10 +1,14 @@
 #include <ros/ros.h>
+#include <fstream>
+#include <sstream>
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_types.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/extract_indices.h>
+
+#include "lidar_camera_projection/detections_loader.hpp"
 
 typedef pcl::PointXYZI PointT;
 
@@ -13,7 +17,7 @@ public:
   LidarFilterNode()
     : nh_("~")
   {
-    std::string input_topic, output_topic;
+    std::string input_topic, output_topic, detections_input, detections_output;
     double voxel_leaf_size;
 
     nh_.param<std::string>("input_topic", input_topic, "/livox/lidar");
@@ -22,17 +26,54 @@ public:
     nh_.param<double>("ransac_distance_threshold", ransac_distance_threshold_, 0.05);
     nh_.param<int>("ransac_max_iterations", ransac_max_iterations_, 100);
 
+    nh_.param<std::string>("detections_input", detections_input, "/home/robot/projects/catkin_ws2/data/detections.json");
+    nh_.param<std::string>("detections_output", detections_output, "/home/robot/projects/catkin_ws2/data/detections_pixel.json");
+    nh_.param<int>("img_width", img_width_, 1920);
+    nh_.param<int>("img_height", img_height_, 1080);
+    nh_.param<double>("detections_update_rate", detections_update_rate_, 0.1);
+
     input_topic_ = input_topic;
     output_topic_ = output_topic;
     voxel_leaf_size_ = voxel_leaf_size;
+    detections_input_ = detections_input;
+    detections_output_ = detections_output;
 
     ROS_INFO("[LidarFilter] input_topic: %s", input_topic_.c_str());
     ROS_INFO("[LidarFilter] output_topic: %s", output_topic_.c_str());
     ROS_INFO("[LidarFilter] voxel_leaf_size: %.3f  ransac_dist: %.3f  ransac_iter: %d",
              voxel_leaf_size_, ransac_distance_threshold_, ransac_max_iterations_);
+    ROS_INFO("[LidarFilter] detections_update_rate: %.2fs  input: %s",
+             detections_update_rate_, detections_input_.c_str());
 
     sub_ = nh_.subscribe(input_topic_, 10, &LidarFilterNode::cloudCallback, this);
     pub_ = nh_.advertise<sensor_msgs::PointCloud2>(output_topic_, 10);
+
+    detections_timer_ = nh_.createTimer(ros::Duration(detections_update_rate_),
+                                        &LidarFilterNode::detectionsTimerCallback, this);
+    detectionsTimerCallback(ros::TimerEvent());  // initial load
+  }
+
+  void detectionsTimerCallback(const ros::TimerEvent&)
+  {
+    static int last_count = -1;
+    if (loadAndSaveDetections(detections_input_, detections_output_, img_width_, img_height_)) {
+      // re-read output to count detections
+      std::ifstream ifs(detections_output_);
+      if (ifs.is_open()) {
+        std::stringstream ss;
+        ss << ifs.rdbuf();
+        std::string content = ss.str();
+        size_t pos = 0, count = 0;
+        while ((pos = content.find("\"class_id\"", pos)) != std::string::npos) {
+          count++;
+          pos++;
+        }
+        if (static_cast<int>(count) != last_count) {
+          last_count = count;
+          ROS_INFO("[LidarFilter] detections: img %dx%d  count: %zu", img_width_, img_height_, count);
+        }
+      }
+    }
   }
 
   void cloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
@@ -65,7 +106,7 @@ public:
     pcl::ExtractIndices<PointT> extract;
     extract.setInputCloud(cloud_x);
     extract.setIndices(inliers);
-    extract.setNegative(true);  // remove inliers (ground plane)
+    extract.setNegative(true);
     extract.filter(*cloud_no_ground);
 
     // Step 3: voxel filter
@@ -75,34 +116,30 @@ public:
     voxel.setLeafSize(voxel_leaf_size_, voxel_leaf_size_, voxel_leaf_size_);
     voxel.filter(*cloud_voxel);
 
-    // Step 4: publish as sensor_msgs::PointCloud2
+    // Step 4: publish
     sensor_msgs::PointCloud2 msg_out;
     pcl::toROSMsg(*cloud_voxel, msg_out);
     msg_out.header = msg->header;
     pub_.publish(msg_out);
-
-    static int count = 0;
-    static ros::Time last = ros::Time::now();
-    count++;
-    if ((ros::Time::now() - last).toSec() >= 2.0) {
-      double dt = (ros::Time::now() - last).toSec();
-      ROS_INFO("[LidarFilter] fps=%.1f  in=%zu  no_ground=%zu  out=%zu",
-               count / dt, cloud_x->size(), cloud_no_ground->size(), cloud_voxel->size());
-      count = 0;
-      last = ros::Time::now();
-    }
   }
 
 private:
   ros::NodeHandle nh_;
   ros::Subscriber sub_;
   ros::Publisher pub_;
+  ros::Timer detections_timer_;
 
   std::string input_topic_;
   std::string output_topic_;
   double voxel_leaf_size_;
   double ransac_distance_threshold_;
   int ransac_max_iterations_;
+
+  std::string detections_input_;
+  std::string detections_output_;
+  int img_width_;
+  int img_height_;
+  double detections_update_rate_;
 };
 
 int main(int argc, char** argv)
