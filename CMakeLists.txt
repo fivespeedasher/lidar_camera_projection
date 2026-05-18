@@ -14,9 +14,22 @@ include_directories(${catkin_INCLUDE_DIRS}
 add_library(detections_loader src/detections_loader.cpp)
 target_include_directories(detections_loader PUBLIC ${catkin_INCLUDE_DIRS})
 
+add_library(transform_utils src/transform_utils.cpp)
+target_include_directories(transform_utils PUBLIC ${catkin_INCLUDE_DIRS})
+target_link_libraries(transform_utils
+  ${catkin_LIBRARIES}
+)
+
 add_executable(lidar_filter_node src/lidar_filter_node.cpp)
 add_dependencies(lidar_filter_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(lidar_filter_node
   detections_loader
+  ${catkin_LIBRARIES}
+)
+
+add_executable(camera_frame_filter_node src/camera_frame_filter_node.cpp)
+add_dependencies(camera_frame_filter_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(camera_frame_filter_node
+  transform_utils
   ${catkin_LIBRARIES}
 )

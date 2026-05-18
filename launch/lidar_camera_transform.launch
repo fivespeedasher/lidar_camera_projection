@@ -1,0 +1,15 @@
+<launch>
+  <arg name="input_topic" default="/livox/filtered"/>
+  <arg name="output_topic" default="/livox/filtered_camera_frame"/>
+  <arg name="calib_path" default="/home/robot/projects/catkin_ws2/data/calib.json"/>
+  <arg name="img_width" default="1280"/>
+  <arg name="img_height" default="720"/>
+
+  <node name="camera_frame_filter_node" pkg="lidar_camera_projection" type="camera_frame_filter_node" output="screen">
+    <param name="input_topic" value="$(arg input_topic)"/>
+    <param name="output_topic" value="$(arg output_topic)"/>
+    <param name="calib_path" value="$(arg calib_path)"/>
+    <param name="img_width" value="$(arg img_width)"/>
+    <param name="img_height" value="$(arg img_height)"/>
+  </node>
+</launch>
