@@ -159,14 +159,14 @@ void TransformMatrixBuilder::transformCloudToPixel(
 
   for (const auto& pt : cloud_camera_world->points) {
     float z = pt.z;
-    if (z <= 0.05f) continue;
+    // if (z <= 0.05f) continue;
 
     float inv_z = 1.0f / z;
     float u = fx_ * pt.x * inv_z + cx_;
     float v = fy_ * pt.y * inv_z + cy_;
 
-    if (u < 0 || u >= img_width_)  continue;
-    if (v < 0 || v >= img_height_) continue;
+    // if (u < 0 || u >= img_width_)  continue;
+    // if (v < 0 || v >= img_height_) continue;
 
     PointT pt_pix;
     pt_pix.x = u;

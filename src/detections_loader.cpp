@@ -155,3 +155,35 @@ bool loadAndSaveDetections(const std::string& input_path,
   ofs.close();
   return true;
 }
+
+bool loadDetectionsPixel(const std::string& path, DetectionsOutput& out) {
+  std::ifstream ifs(path);
+  if (!ifs.is_open()) return false;
+  std::stringstream ss;
+  ss << ifs.rdbuf();
+  std::string json = ss.str();
+
+  std::string res_obj = extractObject(json, "resolution");
+  out.width  = getInt(res_obj, "width");
+  out.height = getInt(res_obj, "height");
+
+  std::string det_arr = extractArray(json, "detections");
+  std::vector<std::string> objects = splitObjects(det_arr);
+
+  out.detections.clear();
+  for (const auto& obj : objects) {
+    Detection det;
+    det.class_id   = getInt(obj, "class_id");
+    det.confidence = getDouble(obj, "confidence");
+
+    std::string bbox_str = extractObject(obj, "bbox_pixel");
+    det.bbox_pixel.xmin = getInt(bbox_str, "xmin");
+    det.bbox_pixel.ymin = getInt(bbox_str, "ymin");
+    det.bbox_pixel.xmax = getInt(bbox_str, "xmax");
+    det.bbox_pixel.ymax = getInt(bbox_str, "ymax");
+    det.bbox_pixel.computeCorners();
+
+    out.detections.push_back(det);
+  }
+  return true;
+}

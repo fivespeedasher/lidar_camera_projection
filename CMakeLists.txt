@@ -20,6 +20,12 @@ target_link_libraries(transform_utils
   ${catkin_LIBRARIES}
 )
 
+add_library(point_lookup src/point_lookup.cpp)
+target_include_directories(point_lookup PUBLIC ${catkin_INCLUDE_DIRS})
+target_link_libraries(point_lookup
+  ${catkin_LIBRARIES}
+)
+
 add_executable(lidar_filter_node src/lidar_filter_node.cpp)
 add_dependencies(lidar_filter_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(lidar_filter_node
@@ -27,9 +33,11 @@ target_link_libraries(lidar_filter_node
   ${catkin_LIBRARIES}
 )
 
-add_executable(camera_frame_filter_node src/camera_frame_filter_node.cpp)
-add_dependencies(camera_frame_filter_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(camera_frame_filter_node
+add_executable(camera_frame_node src/camera_frame_node.cpp)
+add_dependencies(camera_frame_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(camera_frame_node
   transform_utils
+  point_lookup
+  detections_loader
   ${catkin_LIBRARIES}
 )

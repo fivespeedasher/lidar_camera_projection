@@ -85,7 +85,7 @@ public:
     pcl::PointCloud<PointT>::Ptr cloud_x(new pcl::PointCloud<PointT>);
     cloud_x->reserve(cloud_in->size());
     for (const auto& pt : cloud_in->points) {
-      if (pt.x > 0.0f) {
+      if (pt.x > 0.1f) {
         cloud_x->push_back(pt);
       }
     }

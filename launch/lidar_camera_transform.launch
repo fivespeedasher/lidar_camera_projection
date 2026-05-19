@@ -5,7 +5,7 @@
   <arg name="img_width" default="1280"/>
   <arg name="img_height" default="720"/>
 
-  <node name="camera_frame_filter_node" pkg="lidar_camera_projection" type="camera_frame_filter_node" output="screen">
+  <node name="camera_frame_node" pkg="lidar_camera_projection" type="camera_frame_node" output="screen">
     <param name="input_topic" value="$(arg input_topic)"/>
     <param name="output_topic" value="$(arg output_topic)"/>
     <param name="calib_path" value="$(arg calib_path)"/>
