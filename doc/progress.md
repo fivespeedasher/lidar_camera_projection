@@ -5,6 +5,7 @@
 - **2026-05-18**: Added `loadDetectionsPixel()` to read `detections_pixel.json` — `src/detections_loader.cpp`, `detections_loader.hpp`
 - **2026-05-18**: Integrated `PointLookup` and detection loading into `camera_frame_node` — publishes `/livox/inbox_voxel`
 - **2026-05-18**: Modified `transformCloudToPixel` to preserve all points (no boundary/depth filtering) — ensures 1:1 correspondence between `cloud_pixel` and `cloud_voxel`
+- **2026-05-19**: Added Euclidean clustering to select the biggest cluster of points in the inbox, which is more likely to correspond to the detected object.
 
 ## In Progress
 - **Point-in-box query**: Working end-to-end. Needs testing with live data to validate voxel-point correspondence.
@@ -20,5 +21,3 @@
 
 ## Milestones
 - [x] Point lookup infrastructure (grid + query + integration) — completed 2026-05-18
-- [ ] Verified end-to-end with live data (target: TBD)
-- [ ] Detection box visualization overlays (target: TBD)

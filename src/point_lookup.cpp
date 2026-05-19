@@ -1,5 +1,8 @@
 #include "lidar_camera_projection/point_lookup.hpp"
 #include <algorithm>
+#include <pcl/search/kdtree.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/segmentation/extract_clusters.h>
 
 void PointLookup::build(const pcl::PointCloud<PointT>::Ptr& cloud_pixel,
                         int img_width, int img_height, int cell_size) {
@@ -37,5 +40,42 @@ void PointLookup::queryBox(const pcl::PointCloud<PointT>::Ptr& cloud_pixel,
         }
       }
     }
+  }
+}
+
+void PointLookup::extractLargestCluster(
+    const pcl::PointCloud<PointT>::Ptr& cloud_in,
+    pcl::PointCloud<PointT>::Ptr& out_cloud,
+    double tolerance) const {
+  out_cloud->clear();
+  if (cloud_in->empty()) return;
+
+  pcl::search::KdTree<PointT>::Ptr tree(
+    new pcl::search::KdTree<PointT>);
+  tree->setInputCloud(cloud_in);
+
+  std::vector<pcl::PointIndices> clusters;
+  pcl::EuclideanClusterExtraction<PointT> extraction;
+  extraction.setClusterTolerance(tolerance);
+  extraction.setMinClusterSize(3);
+  extraction.setMaxClusterSize(1e6);
+  extraction.setSearchMethod(tree);
+  extraction.setInputCloud(cloud_in);
+  extraction.extract(clusters);
+
+  if (clusters.empty()) return;
+
+  size_t best_idx = 0;
+  size_t best_size = 0;
+  for (size_t i = 0; i < clusters.size(); ++i) {
+    if (clusters[i].indices.size() > best_size) {
+      best_size = clusters[i].indices.size();
+      best_idx = i;
+    }
+  }
+
+  out_cloud->points.clear();
+  for (const auto idx : clusters[best_idx].indices) {
+    out_cloud->points.push_back(cloud_in->points[idx]);
   }
 }

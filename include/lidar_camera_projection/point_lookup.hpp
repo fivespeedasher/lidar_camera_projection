@@ -11,12 +11,17 @@ typedef pcl::PointXYZI PointT;
 class PointLookup {
 public:
   void build(const pcl::PointCloud<PointT>::Ptr& cloud_pixel,
-             int img_width, int img_height, int cell_size = 32);
+             int img_width, int img_height, int cell_size = 10);
 
   void queryBox(const pcl::PointCloud<PointT>::Ptr& cloud_pixel,
                 const pcl::PointCloud<PointT>::Ptr& cloud_voxel,
                 int xmin, int ymin, int xmax, int ymax,
                 pcl::PointCloud<PointT>::Ptr& out_cloud) const;
+
+  /** Extract clusters via Euclidean distance and return only the largest one. */
+  void extractLargestCluster(const pcl::PointCloud<PointT>::Ptr& cloud_in,
+                             pcl::PointCloud<PointT>::Ptr& out_cloud,
+                             double tolerance = 0.8) const;
 
 private:
   struct Cell {

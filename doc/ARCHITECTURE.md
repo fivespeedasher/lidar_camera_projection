@@ -494,6 +494,7 @@ roslaunch lidar_camera_projection lidar_camera_transform.launch
 ## 12. 更新记录
 
 - **2026-05-18**: 新增 `point_lookup` 模块 (2D 空间网格 + 检测框查询); 新增 `loadDetectionsPixel()` 函数; `camera_frame_node` 集成框内点查询, 发布 `/livox/inbox_voxel`; `transformCloudToPixel` 改为保留所有点 (N in = N out)
-- **TODO**: ~~将点云字典化~~ — 通过数组索引作为点 ID 已解决, 见 `doc/decisions.md`
-- **TODO**: inbox聚类过滤
+- [x]: ~~将点云字典化~~ — 通过数组索引作为点 ID 已解决, 见 `doc/decisions.md`
+- [x]: inbox聚类过滤
 - **TODO**: 检测框用什么形式作为比较好？1. 4角像素坐标 (xmin, ymin, xmax, ymax) 2. 中心点+宽高的比例 (x_center, y_center, width, height)，与此同时把grid改成分辨率划分的形式。
+- []: 将tolerance放到launch处方便修改。

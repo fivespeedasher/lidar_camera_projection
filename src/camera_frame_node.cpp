@@ -78,9 +78,14 @@ public:
                          det.bbox_pixel.xmin, det.bbox_pixel.ymin,
                          det.bbox_pixel.xmax, det.bbox_pixel.ymax,
                          inbox);
-        ROS_INFO("[CameraFrameFilter] class %d: %zu inbox points",
-                 det.class_id, inbox->points.size());
-        *inbox_all += *inbox;
+
+        pcl::PointCloud<PointT>::Ptr inbox_clustered(new pcl::PointCloud<PointT>);
+        lookup_.extractLargestCluster(inbox, inbox_clustered);
+
+        ROS_INFO("[CameraFrameFilter] class %d: %zu inbox points, %zu after clustering",
+                 det.class_id, inbox->points.size(),
+                 inbox_clustered->points.size());
+        *inbox_all += *inbox_clustered;
       }
       ROS_INFO("[CameraFrameFilter] total inbox points: %zu", inbox_all->points.size());
 
