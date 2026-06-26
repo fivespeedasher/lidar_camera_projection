@@ -32,4 +32,23 @@ struct DetectionsOutput {
   std::vector<Detection> detections;
 };
 
+struct BBoxNormalized {
+  double x_center;  // [0,1]
+  double y_center;  // [0,1]
+  double width;     // [0,1]
+  double height;    // [0,1]
+};
+
+struct DetectionNormalized {
+  int class_id;
+  BBoxNormalized bbox;
+  double confidence;
+};
+
+struct NormalizedDetectionsOutput {
+  int width;
+  int height;
+  std::vector<DetectionNormalized> detections;
+};
+
 #endif  // LIDAR_CAMERA_PROJECTION_DETECTIONS_HPP

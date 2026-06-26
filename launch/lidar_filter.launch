@@ -1,12 +1,11 @@
 <launch>
   <arg name="input_topic" default="/livox/lidar"/>
   <arg name="output_topic" default="/livox/filtered"/>
-  <arg name="voxel_leaf_size" default="0.1"/>
   <arg name="ransac_distance_threshold" default="0.07"/>
+  <arg name="voxel_leaf_size" default="0.1"/>
   <arg name="ransac_max_iterations" default="50"/>
 
   <arg name="detections_input" default="/home/robot/projects/catkin_ws2/data/detections.json"/>
-  <arg name="detections_output" default="/home/robot/projects/catkin_ws2/data/detections_pixel.json"/>
   <arg name="img_width" default="1280"/>
   <arg name="img_height" default="720"/>
   <arg name="detections_update_rate" default="0.1"/>
@@ -18,7 +17,6 @@
     <param name="ransac_distance_threshold" value="$(arg ransac_distance_threshold)"/>
     <param name="ransac_max_iterations" value="$(arg ransac_max_iterations)"/>
     <param name="detections_input" value="$(arg detections_input)"/>
-    <param name="detections_output" value="$(arg detections_output)"/>
     <param name="img_width" value="$(arg img_width)"/>
     <param name="img_height" value="$(arg img_height)"/>
     <param name="detections_update_rate" value="$(arg detections_update_rate)"/>

@@ -43,6 +43,19 @@ void PointLookup::queryBox(const pcl::PointCloud<PointT>::Ptr& cloud_pixel,
   }
 }
 
+void PointLookup::queryBoxNormalized(const pcl::PointCloud<PointT>::Ptr& cloud_pixel,
+                                     const pcl::PointCloud<PointT>::Ptr& cloud_voxel,
+                                     double x_center, double y_center,
+                                     double width, double height,
+                                     pcl::PointCloud<PointT>::Ptr& out_cloud) const {
+  int xmin = static_cast<int>((x_center - width * 0.5)  * img_width_);
+  int xmax = static_cast<int>((x_center + width * 0.5)  * img_width_);
+  int ymin = static_cast<int>((y_center - height * 0.5) * img_height_);
+  int ymax = static_cast<int>((y_center + height * 0.5) * img_height_);
+
+  queryBox(cloud_pixel, cloud_voxel, xmin, ymin, xmax, ymax, out_cloud);
+}
+
 void PointLookup::extractLargestCluster(
     const pcl::PointCloud<PointT>::Ptr& cloud_in,
     pcl::PointCloud<PointT>::Ptr& out_cloud,

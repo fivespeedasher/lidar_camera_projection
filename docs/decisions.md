@@ -20,7 +20,7 @@
 
 **Date**: 2026-05-18
 
-**Decision**: Use a uniform 2D grid (32px cell size) to bucket pixel-space point indices, rather than a linear scan or kd-tree.
+**Decision**: Use a uniform 2D grid (10px cell size default) to bucket pixel-space point indices, rather than a linear scan or kd-tree.
 
 **Rationale**: Given a detection bounding box, we only need to check points in grid cells that overlap the box. Build time is O(N), query time is O(K) where K is the number of points in relevant cells (typically much less than N). A linear scan would be O(N) per box — fine for small clouds but degrades with more points or many boxes.
 
@@ -29,4 +29,26 @@
 - **PCL KdTreeFLANN (2D)**: O(N log N) build, O(log N + K) per range search. Works but is heavier to build per frame than the grid, and range queries are not as direct as cell iteration.
 - **Hash map (float keys)**: Unordered map keyed by (u, v) pixel coords. Hash collisions from floating-point precision make it fragile.
 
-**Consequences**: Introduces `libpoint_lookup.so` and `PointLookup` class. Cell size is configurable (default 32). Grid memory overhead is O(N + G) where G is the number of cells (920 cells for 1280x720 with 32px cells).
+**Consequences**: Introduces `libpoint_lookup.so` and `PointLookup` class. Cell size is configurable (default 10). Grid memory overhead is O(N + G) where G is the number of cells.
+
+---
+
+## Normalized detection bboxes queried directly (no intermediate pixel conversion)
+
+**Date**: 2026-05-20
+
+**Decision**: `camera_frame_node` reads `detections.json` directly and uses `PointLookup::queryBoxNormalized()` which scales [0,1] coordinates to pixel space internally. Removed `loadAndSaveDetections()` disk write, `detections_pixel.json`, and `loadDetectionsPixel()`.
+
+**Rationale**: The normalized→pixel multiplication was a per-frame waste — done once in a file write, then again on file read. Working directly with [0,1] bboxes eliminates unnecessary disk I/O. The 2D grid remains pixel-based (correct for projected LiDAR points); only the bbox input path changed.
+
+**Consequences**: `lidar_filter_node` no longer writes `detections_pixel.json`. The `detections_loader` library now only exports `loadDetectionsNormalized()`.
+
+---
+
+## Cluster tolerance as configurable ROS param
+
+**Date**: 2026-05-20
+
+**Decision**: `cluster_tolerance` exposed as a ROS param in `lidar_camera_transform.launch` (default 0.8), set via `nh_.param<double>("cluster_tolerance", lookup_.cluster_tolerance_, 0.8)`.
+
+**Consequences**: Users can tune Euclidean clustering sensitivity without recompiling.

@@ -22,7 +22,8 @@ public:
     nh_.param<int>("img_width", img_width_, 1280);
     nh_.param<int>("img_height", img_height_, 720);
     nh_.param<std::string>("detections_path", detections_path_,
-                           "/home/robot/projects/catkin_ws2/data/detections_pixel.json");
+                           "/home/robot/projects/catkin_ws2/data/detections.json");
+    nh_.param<double>("cluster_tolerance", lookup_.cluster_tolerance_, 0.8);
 
     input_topic_ = input_topic;
     output_topic_ = output_topic;
@@ -69,18 +70,18 @@ public:
     // Build 2D spatial grid and query detection boxes
     lookup_.build(cloud_pixel, img_width_, img_height_);
 
-    DetectionsOutput detections;
-    if (loadDetectionsPixel(detections_path_, detections)) {
+    NormalizedDetectionsOutput detections;
+    if (loadDetectionsNormalized(detections_path_, detections)) {
       pcl::PointCloud<PointT>::Ptr inbox_all(new pcl::PointCloud<PointT>);
       for (const auto& det : detections.detections) {
         pcl::PointCloud<PointT>::Ptr inbox(new pcl::PointCloud<PointT>);
-        lookup_.queryBox(cloud_pixel, cloud_in,
-                         det.bbox_pixel.xmin, det.bbox_pixel.ymin,
-                         det.bbox_pixel.xmax, det.bbox_pixel.ymax,
-                         inbox);
+        lookup_.queryBoxNormalized(cloud_pixel, cloud_in,
+                                   det.bbox.x_center, det.bbox.y_center,
+                                   det.bbox.width, det.bbox.height,
+                                   inbox);
 
         pcl::PointCloud<PointT>::Ptr inbox_clustered(new pcl::PointCloud<PointT>);
-        lookup_.extractLargestCluster(inbox, inbox_clustered);
+        lookup_.extractLargestCluster(inbox, inbox_clustered, lookup_.cluster_tolerance_);
 
         ROS_INFO("[CameraFrameFilter] class %d: %zu inbox points, %zu after clustering",
                  det.class_id, inbox->points.size(),

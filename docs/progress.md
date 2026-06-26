@@ -5,10 +5,13 @@
 - **2026-05-18**: Added `loadDetectionsPixel()` to read `detections_pixel.json` — `src/detections_loader.cpp`, `detections_loader.hpp`
 - **2026-05-18**: Integrated `PointLookup` and detection loading into `camera_frame_node` — publishes `/livox/inbox_voxel`
 - **2026-05-18**: Modified `transformCloudToPixel` to preserve all points (no boundary/depth filtering) — ensures 1:1 correspondence between `cloud_pixel` and `cloud_voxel`
-- **2026-05-19**: Added Euclidean clustering to select the biggest cluster of points in the inbox, which is more likely to correspond to the detected object.
+- **2026-05-19**: Added Euclidean clustering to select the biggest cluster of points in the inbox
+- **2026-05-20**: Replaced `loadDetectionsPixel()` + `loadAndSaveDetections()` + `detections_pixel.json` with `loadDetectionsNormalized()` — detections now queried directly from `detections.json` via [0,1] bboxes
+- **2026-05-20**: Added `queryBoxNormalized()` to `PointLookup` — accepts normalized detection coords without pixel conversion
+- **2026-05-20**: Made `cluster_tolerance` a configurable ROS param (default 0.8) in `lidar_camera_transform.launch`
 
 ## In Progress
-- **Point-in-box query**: Working end-to-end. Needs testing with live data to validate voxel-point correspondence.
+- None
 
 ## Blocked
 - None
@@ -21,3 +24,4 @@
 
 ## Milestones
 - [x] Point lookup infrastructure (grid + query + integration) — completed 2026-05-18
+- [x] Normalized detection bbox path (no intermediate file I/O) — completed 2026-05-20

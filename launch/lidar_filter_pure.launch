@@ -1,0 +1,19 @@
+<launch>
+  <!--
+    Pure LiDAR filter launch — no detections dependency.
+    Suitable for inclusion in ros_web_bridge.launch.
+  -->
+  <arg name="input_topic" default="/livox/lidar"/>
+  <arg name="output_topic" default="/livox/filtered"/>
+  <arg name="voxel_leaf_size" default="0.1"/>
+  <arg name="ransac_distance_threshold" default="0.07"/>
+  <arg name="ransac_max_iterations" default="50"/>
+
+  <node name="lidar_filter_pure_node" pkg="lidar_camera_projection" type="lidar_filter_pure_node" output="screen">
+    <param name="input_topic" value="$(arg input_topic)"/>
+    <param name="output_topic" value="$(arg output_topic)"/>
+    <param name="voxel_leaf_size" value="$(arg voxel_leaf_size)"/>
+    <param name="ransac_distance_threshold" value="$(arg ransac_distance_threshold)"/>
+    <param name="ransac_max_iterations" value="$(arg ransac_max_iterations)"/>
+  </node>
+</launch>
