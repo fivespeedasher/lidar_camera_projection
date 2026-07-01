@@ -8,4 +8,7 @@
 bool loadDetectionsNormalized(const std::string& path,
                                NormalizedDetectionsOutput& out);
 
+// Load detections from new format: bbox is an array [xmin, ymin, xmax, ymax]
+bool loadDetectionsPixelNew(const std::string& json_str, DetectionsOutput& out);
+
 #endif  // LIDAR_CAMERA_PROJECTION_DETECTIONS_LOADER_HPP

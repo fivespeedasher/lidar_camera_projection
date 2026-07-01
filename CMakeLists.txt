@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(lidar_camera_projection)
 
+<<<<<<< HEAD
 find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs pcl_ros pcl_conversions tf2_eigen std_srvs)
+=======
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs pcl_ros pcl_conversions tf2_eigen)
+>>>>>>> 8256c72... change the detection to publish-subscribe mode
 
 catkin_package(
-  CATKIN_DEPENDS roscpp sensor_msgs pcl_ros pcl_conversions
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs pcl_ros pcl_conversions
 )
 
 include_directories(${catkin_INCLUDE_DIRS}
@@ -29,7 +33,6 @@ target_link_libraries(point_lookup
 add_executable(lidar_filter_node src/lidar_filter_node.cpp)
 add_dependencies(lidar_filter_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(lidar_filter_node
-  detections_loader
   ${catkin_LIBRARIES}
 )
 
@@ -45,5 +48,11 @@ target_link_libraries(camera_frame_node
   transform_utils
   point_lookup
   detections_loader
+  ${catkin_LIBRARIES}
+)
+
+add_executable(detections_publisher_node src/detections_publisher_node.cpp)
+add_dependencies(detections_publisher_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(detections_publisher_node
   ${catkin_LIBRARIES}
 )

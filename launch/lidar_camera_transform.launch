@@ -6,12 +6,19 @@
   <arg name="img_height" default="720"/>
   <arg name="cluster_tolerance" default="0.6"/>
 
+  <!-- Detections topic (subscribed by camera_frame_node) -->
+  <arg name="detections_topic" default="/detections/pixel"/>
+
   <node name="camera_frame_node" pkg="lidar_camera_projection" type="camera_frame_node" output="screen">
     <param name="input_topic" value="$(arg input_topic)"/>
     <param name="output_topic" value="$(arg output_topic)"/>
     <param name="calib_path" value="$(arg calib_path)"/>
     <param name="img_width" value="$(arg img_width)"/>
     <param name="img_height" value="$(arg img_height)"/>
+<<<<<<< HEAD
     <param name="cluster_tolerance" value="$(arg cluster_tolerance)"/>
+=======
+    <param name="detections_topic" value="$(arg detections_topic)"/>
+>>>>>>> 8256c72... change the detection to publish-subscribe mode
   </node>
 </launch>

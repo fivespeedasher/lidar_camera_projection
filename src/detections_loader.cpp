@@ -95,8 +95,33 @@ static double getDoubleFromBBox(const std::string& bbox_str, const std::string& 
   return std::stod(val);
 }
 
+<<<<<<< HEAD
 bool loadDetectionsNormalized(const std::string& path,
                                NormalizedDetectionsOutput& out) {
+=======
+// Extract a JSON array of integers, e.g. [187, 348, 396, 405]
+static std::vector<int> extractIntArray(const std::string& json, const std::string& key) {
+  std::vector<int> result;
+  size_t pos = json.find("\"" + key + "\"");
+  if (pos == std::string::npos) return result;
+  size_t bracket = json.find('[', pos);
+  if (bracket == std::string::npos) return result;
+  size_t end = json.find(']', bracket);
+  if (end == std::string::npos) return result;
+  std::string inner = json.substr(bracket + 1, end - bracket - 1);
+  std::stringstream ss(inner);
+  std::string token;
+  while (std::getline(ss, token, ',')) {
+    token.erase(remove_if(token.begin(), token.end(), ::isspace), token.end());
+    if (!token.empty()) {
+      result.push_back(std::stoi(token));
+    }
+  }
+  return result;
+}
+
+bool loadDetectionsPixel(const std::string& path, DetectionsOutput& out) {
+>>>>>>> 8256c72... change the detection to publish-subscribe mode
   std::ifstream ifs(path);
   if (!ifs.is_open()) return false;
   std::stringstream ss;
@@ -127,3 +152,32 @@ bool loadDetectionsNormalized(const std::string& path,
   return true;
 }
 
+<<<<<<< HEAD
+=======
+bool loadDetectionsPixelNew(const std::string& json_str, DetectionsOutput& out) {
+  out.width = 0;
+  out.height = 0;
+  out.detections.clear();
+
+  std::string det_arr = extractArray(json_str, "detections");
+  std::vector<std::string> objects = splitObjects(det_arr);
+
+  for (const auto& obj : objects) {
+    Detection det;
+    det.class_id   = getInt(obj, "class_id");
+    det.confidence = getDouble(obj, "confidence");
+
+    std::vector<int> bbox = extractIntArray(obj, "bbox");
+    if (bbox.size() == 4) {
+      det.bbox_pixel.xmin = bbox[0];
+      det.bbox_pixel.ymin = bbox[1];
+      det.bbox_pixel.xmax = bbox[2];
+      det.bbox_pixel.ymax = bbox[3];
+      det.bbox_pixel.computeCorners();
+    }
+
+    out.detections.push_back(det);
+  }
+  return true;
+}
+>>>>>>> 8256c72... change the detection to publish-subscribe mode
