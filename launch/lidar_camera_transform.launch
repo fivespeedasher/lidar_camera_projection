@@ -4,7 +4,7 @@
   <arg name="calib_path" default="/home/robot/projects/catkin_ws2/data/calib.json"/>
   <arg name="img_width" default="1280"/>
   <arg name="img_height" default="720"/>
-  <arg name="cluster_tolerance" default="0.8"/>
+  <arg name="cluster_tolerance" default="0.6"/>
 
   <node name="camera_frame_node" pkg="lidar_camera_projection" type="camera_frame_node" output="screen">
     <param name="input_topic" value="$(arg input_topic)"/>
