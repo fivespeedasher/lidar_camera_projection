@@ -15,10 +15,6 @@
     <param name="calib_path" value="$(arg calib_path)"/>
     <param name="img_width" value="$(arg img_width)"/>
     <param name="img_height" value="$(arg img_height)"/>
-<<<<<<< HEAD
-    <param name="cluster_tolerance" value="$(arg cluster_tolerance)"/>
-=======
     <param name="detections_topic" value="$(arg detections_topic)"/>
->>>>>>> 8256c72... change the detection to publish-subscribe mode
   </node>
 </launch>

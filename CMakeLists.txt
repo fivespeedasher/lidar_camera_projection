@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(lidar_camera_projection)
 
-<<<<<<< HEAD
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs pcl_ros pcl_conversions tf2_eigen std_srvs)
-=======
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs pcl_ros pcl_conversions tf2_eigen)
->>>>>>> 8256c72... change the detection to publish-subscribe mode
 
 catkin_package(
   CATKIN_DEPENDS roscpp std_msgs sensor_msgs pcl_ros pcl_conversions

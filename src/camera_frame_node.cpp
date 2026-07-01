@@ -22,13 +22,7 @@ public:
     nh_.param<std::string>("calib_path", calib_path, "/home/robot/projects/catkin_ws2/data/calib.json");
     nh_.param<int>("img_width", img_width_, 1280);
     nh_.param<int>("img_height", img_height_, 720);
-<<<<<<< HEAD
-    nh_.param<std::string>("detections_path", detections_path_,
-                           "/home/robot/projects/catkin_ws2/data/detections.json");
-    nh_.param<double>("cluster_tolerance", lookup_.cluster_tolerance_, 0.8);
-=======
     nh_.param<std::string>("detections_topic", detections_topic, "/detections/pixel");
->>>>>>> 8256c72... change the detection to publish-subscribe mode
 
     input_topic_ = input_topic;
     output_topic_ = output_topic;
@@ -87,32 +81,6 @@ public:
     // Build 2D spatial grid and query detection boxes
     lookup_.build(cloud_pixel, img_width_, img_height_);
 
-<<<<<<< HEAD
-    NormalizedDetectionsOutput detections;
-    if (loadDetectionsNormalized(detections_path_, detections)) {
-      pcl::PointCloud<PointT>::Ptr inbox_all(new pcl::PointCloud<PointT>);
-      for (const auto& det : detections.detections) {
-        pcl::PointCloud<PointT>::Ptr inbox(new pcl::PointCloud<PointT>);
-        lookup_.queryBoxNormalized(cloud_pixel, cloud_in,
-                                   det.bbox.x_center, det.bbox.y_center,
-                                   det.bbox.width, det.bbox.height,
-                                   inbox);
-
-        pcl::PointCloud<PointT>::Ptr inbox_clustered(new pcl::PointCloud<PointT>);
-        lookup_.extractLargestCluster(inbox, inbox_clustered, lookup_.cluster_tolerance_);
-
-        ROS_INFO("[CameraFrameFilter] class %d: %zu inbox points, %zu after clustering",
-                 det.class_id, inbox->points.size(),
-                 inbox_clustered->points.size());
-        *inbox_all += *inbox_clustered;
-      }
-      ROS_INFO("[CameraFrameFilter] total inbox points: %zu", inbox_all->points.size());
-
-      sensor_msgs::PointCloud2 msg_inbox;
-      pcl::toROSMsg(*inbox_all, msg_inbox);
-      msg_inbox.header = msg->header;
-      pub_inbox_.publish(msg_inbox);
-=======
     DetectionsOutput detections;
     {
       boost::mutex::scoped_lock lock(detections_mutex_);
@@ -129,13 +97,12 @@ public:
                        inbox);
 
       pcl::PointCloud<PointT>::Ptr inbox_clustered(new pcl::PointCloud<PointT>);
-      lookup_.extractLargestCluster(inbox, inbox_clustered);
+      lookup_.extractLargestCluster(inbox, inbox_clustered, lookup_.cluster_tolerance_);
 
       ROS_INFO("[CameraFrameFilter] class %d: %zu inbox points, %zu after clustering",
                det.class_id, inbox->points.size(),
                inbox_clustered->points.size());
       *inbox_all += *inbox_clustered;
->>>>>>> 8256c72... change the detection to publish-subscribe mode
     }
     ROS_INFO("[CameraFrameFilter] total inbox points: %zu", inbox_all->points.size());
 

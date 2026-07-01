@@ -95,10 +95,6 @@ static double getDoubleFromBBox(const std::string& bbox_str, const std::string& 
   return std::stod(val);
 }
 
-<<<<<<< HEAD
-bool loadDetectionsNormalized(const std::string& path,
-                               NormalizedDetectionsOutput& out) {
-=======
 // Extract a JSON array of integers, e.g. [187, 348, 396, 405]
 static std::vector<int> extractIntArray(const std::string& json, const std::string& key) {
   std::vector<int> result;
@@ -120,8 +116,7 @@ static std::vector<int> extractIntArray(const std::string& json, const std::stri
   return result;
 }
 
-bool loadDetectionsPixel(const std::string& path, DetectionsOutput& out) {
->>>>>>> 8256c72... change the detection to publish-subscribe mode
+bool loadDetectionsPixel(const std::string& path, NormalizedDetectionsOutput& out) {
   std::ifstream ifs(path);
   if (!ifs.is_open()) return false;
   std::stringstream ss;
@@ -152,8 +147,6 @@ bool loadDetectionsPixel(const std::string& path, DetectionsOutput& out) {
   return true;
 }
 
-<<<<<<< HEAD
-=======
 bool loadDetectionsPixelNew(const std::string& json_str, DetectionsOutput& out) {
   out.width = 0;
   out.height = 0;
@@ -180,4 +173,3 @@ bool loadDetectionsPixelNew(const std::string& json_str, DetectionsOutput& out) 
   }
   return true;
 }
->>>>>>> 8256c72... change the detection to publish-subscribe mode
